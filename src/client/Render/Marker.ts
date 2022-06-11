@@ -187,6 +187,12 @@ export class Marker {
         return this._markerParms.color;
     }
     public set color(color: RGBColorWithAlpha) {
+        color = {
+            r: Math.floor(color.r),
+            g: Math.floor(color.g),
+            b: Math.floor(color.b),
+            a: Math.floor(color.a),
+        };
         this._markerParms.color = color;
     }
     public get detectRadius(): number {

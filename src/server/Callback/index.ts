@@ -1,1 +1,9 @@
-export { RegisterServerCallback, ServerCalblackHandle, ServerCallbackFunction } from "./ServerCallback";
+export {
+    UnregisterServerCallback,
+    RegisterServerCallback,
+    ServerCalblackHandle,
+    ServerCallbackFunction,
+} from './ServerCallback';
+export {
+    TriggerClientCallback
+} from "./TriggerClientCallback";

@@ -1,7 +1,7 @@
 interface CallbackPoolObject {
-    channel: string,
-    callback: ServerCallbackFunction,
-    handle: ServerCalblackHandle,
+    channel: string;
+    callback: ServerCallbackFunction;
+    handle: ServerCalblackHandle;
 }
 
 var callbackPool: CallbackPoolObject[] = [];
@@ -25,7 +25,10 @@ export type ServerCalblackHandle = number;
  *     return "result";
  * }
  */
-export function RegisterServerCallback(callbackChannel: string, callbackFunction: ServerCallbackFunction): ServerCalblackHandle{
+export function RegisterServerCallback(
+    callbackChannel: string,
+    callbackFunction: ServerCallbackFunction,
+): ServerCalblackHandle {
     const handle = callbackPool.length;
     callbackPool.push({
         channel: callbackChannel,
@@ -39,23 +42,28 @@ export function RegisterServerCallback(callbackChannel: string, callbackFunction
  * unregister server callback from callback pool
  * @param {ServerCalblackHandle} callbackHandle callback handler
  */
-export function UnregisterServerCallback(callbackHandle: ServerCalblackHandle): void{
+export function UnregisterServerCallback(callbackHandle: ServerCalblackHandle): void {
     const index = callbackPool[callbackHandle].handle;
     callbackPool.splice(index, 1);
     delete callbackDictionary[callbackHandle];
 }
 
-onNet("triggerServerCallback", (ticket: string, callbackChannel: string, ...args: any[]) => {
+onNet('triggerServerCallback', (ticket: string, callbackChannel: string, ...args: any[]) => {
     const src = source;
     const handle = callbackDictionary[callbackChannel];
     if (handle === undefined) {
         return;
     }
+    if (callbackPool[handle] === undefined) {
+        return;
+    }
     const callback = callbackPool[handle].callback;
-    callback(src, ...args).then((result) => {
-        emitNet("serverCallbackResult", src, ticket, result);
-    }).catch((err) => {
-        console.error(err);
-    });
-    return
-})
+    callback(src, ...args)
+        .then(result => {
+            emitNet('serverCallbackResult', src, ticket, result);
+        })
+        .catch(err => {
+            console.error(err);
+        });
+    return;
+});

@@ -76,6 +76,16 @@ export class Marker {
         this._isPlayerInside = false;
     }
 
+    
+    draw = (): void => {
+        DrawMarker(
+            this._markerParms.id,
+            this._markerParms.position.x,
+            this._markerParms.position.y,
+            this._markerParms.position.z,
+        )
+    }
+
     //#region properties
     public get id(): MarkerID {
         return this._markerParms.id;

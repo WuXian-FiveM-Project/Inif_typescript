@@ -58,6 +58,7 @@ export interface MarkerContructorParams {
     textureDict?: string;
     textureName?: string;
     drawOverEntity?: boolean;
+    spin?: boolean;
     onPlayerEnter?: () => void;
     onPlayerExit?: () => void;
     onPlayerInside?: () => void;
@@ -65,6 +66,7 @@ export interface MarkerContructorParams {
 
 export class Marker {
     private _isPlayerInside: boolean;
+    private _drawTick: number;
     private _markerParms: MarkerContructorParams;
 
     constructor(marker: MarkerContructorParams) {
@@ -77,13 +79,49 @@ export class Marker {
     }
 
     
+    /**
+     * draw marker only one tick
+     */
     draw = (): void => {
+        //TODO: replace GetEntityCoord to player class when Player class are done
+        const currentPlayerPosition = GetEntityCoords(PlayerPedId(), true)
+        if (Vdist2(this._markerParms.position.x, this._markerParms.position.y, this._markerParms.position.z, currentPlayerPosition['x'], currentPlayerPosition['y'], currentPlayerPosition['z']) < this._markerParms.renderDistance) {
+            return;
+        }
         DrawMarker(
             this._markerParms.id,
             this._markerParms.position.x,
             this._markerParms.position.y,
             this._markerParms.position.z,
+            0.0,
+            0.0,
+            0.0,
+            this._markerParms.rotation.x,
+            this._markerParms.rotation.y,
+            this._markerParms.rotation.z,
+            this._markerParms.scale.x,
+            this._markerParms.scale.y,
+            this._markerParms.scale.z,
+            this._markerParms.color.r,
+            this._markerParms.color.g,
+            this._markerParms.color.b,
+            this._markerParms.color.a,
+            this._markerParms.jumping || false,
+            this._markerParms.faceCamera || false,
+            2,
+            this._markerParms.spin||false,
+            this._markerParms.textureDict || null,
+            this._markerParms.textureName || null,
+            this._markerParms.drawOverEntity || false,
         )
+    }
+
+    startDraw = (): void => {
+        this._drawTick = setTick(this.draw);
+    }
+
+    stopDraw = (): void => {
+        clearTick(this._drawTick);
     }
 
     //#region properties
@@ -152,6 +190,12 @@ export class Marker {
     }
     public set drawOverEntity(bool: boolean) {
         this._markerParms.drawOverEntity = bool;
+    }
+    public get spin(): boolean {
+        return this._markerParms.spin;
+    }
+    public set spin(bool: boolean) {
+        this._markerParms.spin = bool;
     }
     public get onPlayerEnter(): () => void {
         return this._markerParms.onPlayerEnter;

@@ -1,18 +1,12 @@
-export type Vector1 = {
-    x: number;
-};
-export type Vector2 =
-    | {
-          y: number;
-      }
-    | Vector1;
-export type Vector3 =
-    | {
-          z: number;
-      }
-    | Vector2;
-export type Vector4 =
-    | {
-          w: number;
-      }
-    | Vector3;
+export interface Vector1 {
+    x: number
+}
+export interface Vector2 extends Vector1 {
+    y: number
+}
+export interface Vector3 extends Vector2 {
+    z: number
+}
+export interface Vector4 extends Vector3 {
+    w: number
+}

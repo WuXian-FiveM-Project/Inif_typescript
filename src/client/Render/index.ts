@@ -1,1 +1,1 @@
-export { Marker } from './Marker';
+export { Marker, MarkerContructorParams, MarkerID } from './Marker';

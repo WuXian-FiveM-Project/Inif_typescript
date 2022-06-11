@@ -52,6 +52,7 @@ export interface MarkerContructorParams {
     rotation?: Vector3;
     scale: Vector3;
     color: RGBColorWithAlpha;
+    detectRadius: number;
     renderDistance?: number;
     jumping?: boolean;
     faceCamera?: boolean;
@@ -78,14 +79,22 @@ export class Marker {
         this._isPlayerInside = false;
     }
 
-    
     /**
      * draw marker only one tick
      */
     draw = (): void => {
         //TODO: replace GetEntityCoord to player class when Player class are done
-        const currentPlayerPosition = GetEntityCoords(PlayerPedId(), true)
-        if (Vdist2(this._markerParms.position.x, this._markerParms.position.y, this._markerParms.position.z, currentPlayerPosition['x'], currentPlayerPosition['y'], currentPlayerPosition['z']) < this._markerParms.renderDistance) {
+        const currentPlayerPosition = GetEntityCoords(PlayerPedId(), true);
+        if (
+            Vdist2(
+                this._markerParms.position.x,
+                this._markerParms.position.y,
+                this._markerParms.position.z,
+                currentPlayerPosition['x'],
+                currentPlayerPosition['y'],
+                currentPlayerPosition['z'],
+            ) < this._markerParms.renderDistance
+        ) {
             return;
         }
         DrawMarker(
@@ -109,20 +118,45 @@ export class Marker {
             this._markerParms.jumping || false,
             this._markerParms.faceCamera || false,
             2,
-            this._markerParms.spin||false,
+            this._markerParms.spin || false,
             this._markerParms.textureDict || null,
             this._markerParms.textureName || null,
             this._markerParms.drawOverEntity || false,
-        )
-    }
+        );
+        if (
+            Vdist2(
+                this._markerParms.position.x,
+                this._markerParms.position.y,
+                this._markerParms.position.z,
+                currentPlayerPosition['x'],
+                currentPlayerPosition['y'],
+                currentPlayerPosition['z'],
+            ) < this._markerParms.detectRadius
+        ) {
+            if (this._isPlayerInside === false) {
+                this._isPlayerInside = true;
+                if (this._markerParms.onPlayerEnter) {
+                    this._markerParms.onPlayerEnter();
+                }
+            }
+            this._markerParms.onPlayerInside();
+        } else {
+            if (this._isPlayerInside === true) {
+                this._isPlayerInside = false;
+                if (this._markerParms.onPlayerExit) {
+                    this._markerParms.onPlayerExit();
+                }
+            }
+        }
+    };
 
     startDraw = (): void => {
         this._drawTick = setTick(this.draw);
-    }
+    };
 
     stopDraw = (): void => {
         clearTick(this._drawTick);
-    }
+    };
 
     //#region properties
     public get id(): MarkerID {
@@ -154,6 +188,12 @@ export class Marker {
     }
     public set color(color: RGBColorWithAlpha) {
         this._markerParms.color = color;
+    }
+    public get detectRadius(): number {
+        return this._markerParms.detectRadius;
+    }
+    public set detectRadius(radius: number) {
+        this._markerParms.detectRadius = radius;
     }
     public get renderDistance(): number {
         return this._markerParms.renderDistance;

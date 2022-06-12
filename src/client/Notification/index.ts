@@ -4,10 +4,8 @@ export {
 
 export {
     ShowHelpNotification,
-    ShowHelpNotificationOneTick,
 } from "./ShowHelpNotification"
 
 export {
     ShowFloatingHelpNotification,
-    ShowFloatingHelpNotificationOneTick
 } from "./ShowFloatingHelpNotification"

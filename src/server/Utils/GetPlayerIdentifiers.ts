@@ -7,29 +7,29 @@ export function GetPlayerIdentifiers(playerID: string | number): PlayerIdentifie
         throw new CantFoundPlayerError(`Player ID:${playerID} not found`);
     }
     var identifiers = getPlayerIdentifiers(playerID);
-    var identifierDict: PlayerIdentifiers;
+    var identifierDict: PlayerIdentifiers = {}
     identifierDict.ID = playerID;
-    identifiers.forEach(async identifier => {
+    identifiers.forEach(identifier => {
         if (identifier.startsWith('steam:')) {
-            identifierDict.Steam = identifier.substring('steam:'.length);
+            identifierDict.Steam = identifier
         }
         if (identifier.startsWith('license:')) {
-            identifierDict.License = identifier.substring('license:'.length);
+            identifierDict.License = identifier
         }
         if (identifier.startsWith('xbl:')) {
-            identifierDict.XBoxLive = identifier.substring('xbl:'.length);
+            identifierDict.XBoxLive = identifier
         }
         if (identifier.startsWith('live:')) {
-            identifierDict.Microsoft = identifier.substring('live:'.length);
+            identifierDict.Microsoft = identifier
         }
         if (identifier.startsWith('ip:')) {
-            identifierDict.IP = identifier.substring('ip:'.length);
+            identifierDict.IP = identifier
         }
         if (identifier.startsWith('discord:')) {
-            identifierDict.Discord = identifier.substring('discord:'.length);
+            identifierDict.Discord = identifier
         }
         if (identifier.startsWith('fivem:')) {
-            identifierDict.FiveM = identifier.substring('fivem:'.length);
+            identifierDict.FiveM = identifier
         }
         identifierDict.Name = GetPlayerName(playerID.toString())
     });

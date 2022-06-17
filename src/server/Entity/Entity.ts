@@ -1,18 +1,33 @@
 import { FiveMCoordsToVector3, Vector3ToFiveMCoords } from '../Utils/Convertor';
 import { Hash, Vector3 } from '../Types';
-import { EntityNotFoundError } from './EntityError';
+import { EntityNotFoundError,EntityAlreadyDeletedError } from './EntityError';
+import { TriggerClientCallback } from '../Callback';
 
 export class Entity {
     entity: number;
-    readonly model: Hash;
+	readonly model: Hash;
+	private _modelName: string
+	private _modelNameSetterLock: boolean
 
+    /**
+    * 	entity constructor
+    * 	@param {number} entityD
+	* 	@throws {EntityNotFoundError} 
+    */
     constructor(entity: number) {
         if (!DoesEntityExist(entity)) {
             throw new EntityNotFoundError(`Entity ID:${entity} not found`);
         }
         this.entity = entity;
-        this.model = GetEntityModel(entity);
+		this.model = GetEntityModel(entity);
+		this._modelNameSetterLock = false;
+		TriggerClientCallback("serverRPC:GetEntityArchetypeName", entity).then((name: string) => {
+			this._modelName = name;
+			this._modelNameSetterLock = true;
+		});
     }
+
+	//#region class static method
 
     public static create(model: Hash, coords: Vector3): Entity {
         return new Entity(
@@ -28,7 +43,47 @@ export class Entity {
         );
     }
 
+	//#endregion
+
+	//#region class method
+
+	/**
+	* delete entity if it exists
+ 	* @returns {void}
+	* @throws {EntityAlreadyDeletedError} when entity is already deleted or can't find
+	*/
+	public delete(): void {
+		if (DoesEntityExist(this.entity)) {
+			this.destroy()
+		} else {
+			throw new EntityAlreadyDeletedError(`Entity ID:${this.entity} already deleted`);
+		}
+	}
+
+	/**
+	* force destroy entity although it is already deleted
+ 	* @returns {void}
+	*/
+	public destroy(): void {
+		DeleteEntity(this.entity);
+	}
+
+
+	//#endregion
+
+
     //#region entity getters and setters
+
+	public get modelName(): string {
+		return this._modelName;
+	}
+	public set modelName(value: string) {
+		if (this._modelNameSetterLock) {
+			return;
+		}
+		this._modelName = value;
+	}
+
     public get position(): Vector3 {
         return FiveMCoordsToVector3(GetEntityCoords(this.entity));
     }

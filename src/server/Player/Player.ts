@@ -1,9 +1,9 @@
 import { GetPlayerIdentifiers } from '../Utils';
 import { CantFoundPlayerError } from './PlayerError';
 import { PlayerIdentifiers } from '../Types/PlayerIdentifiers';
-import { Entity } from '../Entity';
+import { Ped } from "../Ped"
 
-export class Player extends Entity {
+export class Player extends Ped {
     private _identifiers: PlayerIdentifiers;
 
     constructor(id: string | number) {
@@ -19,6 +19,8 @@ export class Player extends Entity {
         console.log('Player.create()');
     }
 
+
+    
     //#region identifiers getters
     public get id(): string {
         return this._identifiers.ID;
